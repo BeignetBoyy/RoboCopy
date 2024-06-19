@@ -42,12 +42,15 @@ This tool won't save data from folders or files that need admin privileges to be
 The full code is inside robocopy.ps1, if you ever want to edit it go ahead but make sure to credit me if you post it online.
 If you want to recompile as an exe after editing it here is how i've managed to do it :
 
+Replace this line : 
 ```
-Replace this line : $script_dir = split-path -parent $MyInvocation.MyCommand.Definition
+$script_dir = split-path -parent $MyInvocation.MyCommand.Definition
+```
 By these two :
+```
 $currentExePath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
 $script_dir = split-path -parent $currentExePath
+```
 
 Then compile the script into an executable whichever way you want (i used win-ps2exe)
 Once complete, change the line back to what it was (so you can run the script itself if you want)
-```
