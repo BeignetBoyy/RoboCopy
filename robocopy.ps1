@@ -1,8 +1,5 @@
 ﻿Add-Type -AssemblyName System.Windows.Forms
 
-# Default directories to be checked
-$checkedArray = "Documents", "Downloads", "Desktop", "Pictures"
-
 # Pour convertir en executable modifier $script_dir = split-path -parent $MyInvocation.MyCommand.Definition en :
 # 
 # $currentExePath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
@@ -12,6 +9,8 @@ $checkedArray = "Documents", "Downloads", "Desktop", "Pictures"
 $script_dir = split-path -parent $MyInvocation.MyCommand.Definition
 $appdata_directories = Get-Content -Path "$script_dir\default_appdata.txt"
 $title = Get-Content -Path "$script_dir\title.txt"
+# Default directories to be checked
+$checkedArray = Get-Content -Path "$script_dir\default.txt"
 
 foreach($line in $title){
     Write-Host $line
