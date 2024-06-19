@@ -1,0 +1,9 @@
+Local\Google\Chrome\User Data 
+Local\Microsoft\Outlook\RoamCache 
+Local\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe
+Roaming\Microsoft\Outlook
+Roaming\Microsoft\Signatures 
+Roaming\Microsoft\Templates
+Roaming\Microsoft\Windows\Themes
+Roaming\Microsoft\Sticky Notes
+Roaming\Mozilla\Firefox
