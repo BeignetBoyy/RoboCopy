@@ -7,6 +7,10 @@ A tool to Save and Restore data from your computer using RoboCopy
 Be warned this tool was made only by myself with a fairly limited knowledge of PowerShell as such don't be surprised if errors happen.  
 Make sure to make a backup of your data before you use this tool, if you lose any data by using this I won't take any accountability.
 
+# Before Using
+
+Make sure any file you have opened in another window is closed 
+
 # How To Use :
 
 Launch ***robocopy.exe***
