@@ -9,11 +9,11 @@
 # Recuperation des dossiers AppData dans fichier texte
 $script_dir = split-path -parent $MyInvocation.MyCommand.Definition
 $appdata_directories = Get-Content -Path "$script_dir\default_appdata.txt"
-# Default directories to be checked
+# Dossier à selectionner par défaut
 $checkedArray = Get-Content -Path "$script_dir\default.txt"
 
 
-# Function to backup directories
+# Fontion de sauvegarde
 function Backup-Directories {
     param (
         [string]$backupDir,
@@ -24,8 +24,10 @@ function Backup-Directories {
     
     foreach ($directory_full in $selectedItems) {
 
+            # Récupération du nom du dossier
             $directory = $directory_full.Split("~~~~")[0]
 
+            # Gestion pour Appdata (small)
             if($directory -eq "AppData (small)"){
                 foreach($app_dir in $appdata_directories){
                     $sourcePath = Join-Path $sourceDir "AppData\$app_dir"
@@ -33,10 +35,11 @@ function Backup-Directories {
 
                     if (Test-Path $sourcePath) {
 
+                        # Ajout d'une barre de progression
                         $index = [Array]::IndexOf($appdata_directories, $app_dir)
                         Write-Progress -PercentComplete ($index/$appdata_directories.Count*100)  -Activity "Sauvegarde de $directory" -Status "Sauvegarde de $sourcePath dans $destPath"
-                        
-                        #Write-Host "Sauvegarde de $sourcePath dans $destPath"
+                       
+                        # Sauvegarde de $sourcePath dans $destPath
                         robocopy "$sourcePath" "$destPath" /E /COPY:DAT /R:1 /W:1 /log+:"$backupDir\robocopy.log"
                         
                     } else {
@@ -49,17 +52,21 @@ function Backup-Directories {
                 $sourcePath = Join-Path $sourceDir $directory
                 $destPath = Join-Path $backupDir $directory
                 
+                # Ajout d'une barre de progression
                 $index = [Array]::IndexOf($selectedItems, $directory_full)
                 Write-Progress -PercentComplete ($index/$selectedItems.Count*100)  -Activity "Sauvegarde de $directory" -Status "Sauvegarde de $sourcePath dans $destPath"
 
+                # Sauvegarde des fichiers
                 if(Test-path -Path $sourcePath -pathtype leaf){
 
-                    #Write-Host "Sauvegarde de $sourcePath dans $destPath"
+                    # Sauvegarde de $sourcePath dans $destPath"
                     robocopy "$sourceDir" "$backupDir" "$directory" /E /COPY:DAT /R:1 /W:1 /XD * /log+:"$backupDir\robocopy.log"
+
+                # Sauvegarde des dossiers
                 }else{
                     if (Test-Path $sourcePath) {
 
-                        #Write-Host "Sauvegarde de $sourcePath dans $destPath"
+                        # Sauvegarde de $sourcePath dans $destPath"
                         robocopy "$sourcePath" "$destPath" /E /COPY:DAT /R:1 /W:1 /log+:"$backupDir\robocopy.log"
                     
                     } else {
@@ -71,11 +78,13 @@ function Backup-Directories {
             }
 
     }
+
+    # Stop la barre de progression
     Write-Progress -Completed -Activity "OK"
     Write-Host "Sauvegarde terminée. Sauvegardé dans $backupDir"
 }
 
-# Function to restore directories
+# Fonction de restauration
 function Restore-Directories {
     param (
         [string]$backupDir,
@@ -88,14 +97,21 @@ function Restore-Directories {
 
             $sourcePath = Join-Path $backupDir $directory
             $destPath = Join-Path $destDir $directory
+                
+            # Ajout d'une barre de progression
+            $index = [Array]::IndexOf($restoreDir, $directory)
+            Write-Progress -PercentComplete ($index/$restoreDir.Count*100)  -Activity "Restauration de $directory" -Status "Restauration de $sourcePath dans $destPath"
 
+            # Dossiers
             if(Test-path -Path $sourcePath -pathtype leaf){
 
-                Write-Host "Sauvegarde de $sourcePath dans $destPath"
+                # Sauvegarde de $sourcePath dans $destPath
                 robocopy "$backupDir" "$destDir" "$directory" /E /COPY:DAT /R:1 /W:1 /XD * /log+:"$backupDir\robocopy.log"
+
+            # Fichiers
             }else{
                 if (Test-Path $sourcePath) {
-                    Write-Host "Restauration de $sourcePath dans $destPath"
+                    # Restauration de $sourcePath dans $destPath
                     robocopy "$sourcePath" "$destPath" /E /COPY:DAT /R:1 /W:1
                 
                 } else {
@@ -103,7 +119,8 @@ function Restore-Directories {
                 }
             }
     }
-    Write-Host "Restauration terminée. Restauré dans $backupDir"
+    Write-Progress -Completed -Activity "OK"
+    Write-Host "Restauration terminée. Restauré dans $destDir"
 }
 
 # Function to browse backup directory
