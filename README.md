@@ -9,13 +9,16 @@ Make sure to make a backup of your data before you use this tool, if you lose an
 
 # Before Using
 
-Make sure any file you have opened in another window is closed 
+Make sure any file you have opened in another window is closed.  
+Admin privileges aren't required for the tool to run, but they will be if you want to access the directory of another user than yourself.
 
 # How To Use :
 
 Launch ***robocopy.exe***
 
-Wait for the data to be recovered 
+Select a user in the bottom right.  
+Wait for the data to be recovered. 
+During this time the tool might freeze, it hasn't crashed just wait.
 
 When the window opens, select a directory from which to save or restore at the top of the window
 
