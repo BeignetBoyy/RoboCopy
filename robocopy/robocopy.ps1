@@ -163,7 +163,7 @@ function Update-Folders {
         $checkList.Items.Remove($item)
     }
 
-    # Directories to backup
+    # Recupération des Dossiers et Fichiers
     $selectedDirectories = @{}
     $userDir = "C:\Users\$username"
     $existingDirectories = Get-ChildItem -Path $userDir -Directory -Force | Where-Object { -not ($_.Attributes -match "ReparsePoint") } 
@@ -237,13 +237,12 @@ function Update-Folders {
     Write-Host "Données récupérées avec succés" 
 }
 
-# Create the form
+# Creation du formulaire
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Sauvegarde et Restauration de fichiers"
 $form.Size = New-Object System.Drawing.Size(500, 410)
 $form.StartPosition = "CenterScreen"
 
-# Backup directory entry
 $backupDirLabel = New-Object System.Windows.Forms.Label
 $backupDirLabel.Text = "Backup Directory:"
 $backupDirLabel.Location = New-Object System.Drawing.Point(10, 20)
@@ -274,7 +273,7 @@ $checkList.CheckOnClick = $true
 
 $form.Controls.Add($checkList)
 
-# Start Backup Button
+#Bouton sauvegarder
 $backupButton = New-Object System.Windows.Forms.Button
 $backupButton.Text = "Sauvegarder"
 $backupButton.Location = New-Object System.Drawing.Point(10, 320)
@@ -291,7 +290,7 @@ $backupButton.Add_Click({
 })
 $form.Controls.Add($backupButton)
 
-# Start Restore Button
+# Bouton restaurer
 $restoreButton = New-Object System.Windows.Forms.Button
 $restoreButton.Text = "Restaurer"
 $restoreButton.Location = New-Object System.Drawing.Point(120, 320)
@@ -299,6 +298,12 @@ $restoreButton.Size = New-Object System.Drawing.Point(100, 30)
 $restoreButton.Add_Click({
     $backupDir = $backupDirEntry.Text
     Restore-Directories -backupDir $backupDir -username $chooseUser.SelectedItem
+
+    if($backupDir -and $chooseUser.SelectedItem){
+        Restore-Directories -backupDir $backupDir -username $chooseUser.SelectedItem
+    }else {
+        [System.Windows.Forms.MessageBox]::Show("Veuillez remplir tous les champs !")
+    }
 })
 $form.Controls.Add($restoreButton)
 
@@ -323,6 +328,6 @@ $chooseUser.Add_SelectedIndexChanged({
     Update-Folders -checkList $checkList -username $chooseUser.SelectedItem
 })
 
-# Show the form
+# Affichage du formulaire
 $form.Add_Shown({ $form.Activate() })
 [void] $form.ShowDialog()
