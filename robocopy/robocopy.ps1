@@ -123,7 +123,7 @@ function Restore-Directories {
     Write-Host "Restauration terminée. Restauré dans $destDir"
 }
 
-# Function to browse backup directory
+# Fonction qui permet de selectionner le dossier cible
 function Browse-BackupDir {
     $folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
     if ($folderBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -131,16 +131,17 @@ function Browse-BackupDir {
     }
 }
 
+# Verifie si il faut les permissions admin pour acceder au dossier
 function Check-AdminRights {
     param (
         [string]$folderPath
     )
     try {
-        # Attempt to get the list of items in the folder
+        # Tentaive de recupereation des dossier
         $items = Get-ChildItem -Path $folderPath -ErrorAction Stop
         return $false
     } catch {
-        # If an error occurs, assume it's due to lack of permissions
+        # Si il y a une erreur on estime qu'il s'agit d'un manque de permission
         return $true
     }
 }
@@ -154,8 +155,12 @@ function Update-Folders {
     )
 
     # Vide la liste des dossiers
-    for($i = 0; $i -lt $checkList.Items.Count; $i++){
-        $checkList.SetItemChecked($i, $false)
+    $itemsToRemove = @()
+    foreach ($item in $checkList.Items) {
+        $itemsToRemove += $item
+    }
+    foreach ($item in $itemsToRemove) {
+        $checkList.Items.Remove($item)
     }
 
     # Directories to backup
