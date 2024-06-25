@@ -312,9 +312,16 @@ $chooseUser.Location = New-Object System.Drawing.Point(260, 330)
 $chooseUser.Size = New-Object System.Drawing.Point(150, 20)
 $form.Controls.Add($chooseUser)
 
+$current_user = $Env:UserName
+
 $users = Get-ChildItem -Path C:\Users -Directory
 foreach($user in $users){
     [void]$chooseUser.Items.Add($user)
+
+    if("$user" -eq $current_user){
+        $chooseUser.SelectedItem = $user
+        Update-Folders -checkList $checkList -username $chooseUser.SelectedItem
+    }
 }
 
 $chooseUser.Add_SelectedIndexChanged({
