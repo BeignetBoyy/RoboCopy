@@ -154,14 +154,7 @@ function Update-Folders {
         $username
     )
 
-    # Vide la liste des dossiers
-    $itemsToRemove = @()
-    foreach ($item in $checkList.Items) {
-        $itemsToRemove += $item
-    }
-    foreach ($item in $itemsToRemove) {
-        $checkList.Items.Remove($item)
-    }
+    $checkList.Items.Clear()
 
     # Recupération des Dossiers et Fichiers
     $selectedDirectories = @{}
