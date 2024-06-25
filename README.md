@@ -67,5 +67,4 @@ Once complete, change the line back to what it was (so you can run the script it
 The executable and script won't be fully operational without the other files. The following features won't be working :
  - Having default folders checked
  - Having the AppData (small)
- - Having the extremly cool 😎 title when launching the tool
  - Having a log once the save/restore is complete
