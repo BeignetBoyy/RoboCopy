@@ -1,19 +1,24 @@
 ﻿Add-Type -AssemblyName System.Windows.Forms
 
-<# Pour convertir en executable modifier $script_dir = split-path -parent $MyInvocation.MyCommand.Definition en :
+<# To compile the script into an exe change this line 
+
+    $script_dir = split-path -parent $MyInvocation.MyCommand.Definition 
+    
+    with these two :
  
     $currentExePath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
     $script_dir = split-path -parent $currentExePath
 #>
 
-# Recuperation des dossiers AppData dans fichier texte
 $script_dir = split-path -parent $MyInvocation.MyCommand.Definition
+
+# Getting the list of default appdata folders from file
 $appdata_directories = Get-Content -Path "$script_dir\default_appdata.txt"
-# Dossier à selectionner par défaut
+# Getting the list of default folders from file
 $checkedArray = Get-Content -Path "$script_dir\default.txt"
 
 
-# Fontion de sauvegarde
+# Save function
 function Backup-Directories {
     param (
         [string]$backupDir,
@@ -24,10 +29,10 @@ function Backup-Directories {
     
     foreach ($directory_full in $selectedItems) {
 
-            # Récupération du nom du dossier
+            # Getting the directory/file name (FolderName~~~~FolderSize --> FolderName)
             $directory = $directory_full.Split("~~~~")[0]
 
-            # Gestion pour Appdata (small)
+            # Manages save for Default appdata folders
             if($directory -eq "AppData (small)"){
                 foreach($app_dir in $appdata_directories){
                     $sourcePath = Join-Path $sourceDir "AppData\$app_dir"
@@ -35,11 +40,11 @@ function Backup-Directories {
 
                     if (Test-Path $sourcePath) {
 
-                        # Ajout d'une barre de progression
+                        # Adding a progress bar
                         $index = [Array]::IndexOf($appdata_directories, $app_dir)
-                        Write-Progress -PercentComplete ($index/$appdata_directories.Count*100)  -Activity "Sauvegarde de $directory" -Status "Sauvegarde de $sourcePath dans $destPath"
+                        Write-Progress -PercentComplete ($index/$appdata_directories.Count*100)  -Activity "Saving $directory" -Status "Saving $sourcePath into $destPath"
                        
-                        # Sauvegarde de $sourcePath dans $destPath
+                        # Saved $sourcePath into $destPath
                         robocopy "$sourcePath" "$destPath" /E /COPY:DAT /R:1 /W:1 /log+:"$backupDir\robocopy.log"
                         
                     } else {
@@ -52,21 +57,21 @@ function Backup-Directories {
                 $sourcePath = Join-Path $sourceDir $directory
                 $destPath = Join-Path $backupDir $directory
                 
-                # Ajout d'une barre de progression
+                # Adding a progress bar
                 $index = [Array]::IndexOf($selectedItems, $directory_full)
-                Write-Progress -PercentComplete ($index/$selectedItems.Count*100)  -Activity "Sauvegarde de $directory" -Status "Sauvegarde de $sourcePath dans $destPath"
+                Write-Progress -PercentComplete ($index/$selectedItems.Count*100)  -Activity "Saving $directory" -Status "Saving $sourcePath into $destPath"
 
-                # Sauvegarde des fichiers
+                # Saving files
                 if(Test-path -Path $sourcePath -pathtype leaf){
 
-                    # Sauvegarde de $sourcePath dans $destPath"
+                    # Saved $sourcePath into $destPath"
                     robocopy "$sourceDir" "$backupDir" "$directory" /E /COPY:DAT /R:1 /W:1 /XD * /log+:"$backupDir\robocopy.log"
 
-                # Sauvegarde des dossiers
+                # Saving directories
                 }else{
                     if (Test-Path $sourcePath) {
 
-                        # Sauvegarde de $sourcePath dans $destPath"
+                        # Saved $sourcePath into $destPath"
                         robocopy "$sourcePath" "$destPath" /E /COPY:DAT /R:1 /W:1 /log+:"$backupDir\robocopy.log"
                     
                     } else {
@@ -79,12 +84,12 @@ function Backup-Directories {
 
     }
 
-    # Stop la barre de progression
+    # Stops the progress bar
     Write-Progress -Completed -Activity "OK"
-    Write-Host "Sauvegarde terminée. Sauvegardé dans $backupDir"
+    Write-Host "Save complete. Saved into $backupDir"
 }
 
-# Fonction de restauration
+# Restore function
 function Restore-Directories {
     param (
         [string]$backupDir,
@@ -98,20 +103,20 @@ function Restore-Directories {
             $sourcePath = Join-Path $backupDir $directory
             $destPath = Join-Path $destDir $directory
                 
-            # Ajout d'une barre de progression
+            # Adding a progress bar
             $index = [Array]::IndexOf($restoreDir, $directory)
-            Write-Progress -PercentComplete ($index/$restoreDir.Count*100)  -Activity "Restauration de $directory" -Status "Restauration de $sourcePath dans $destPath"
+            Write-Progress -PercentComplete ($index/$restoreDir.Count*100)  -Activity "Restoring $directory" -Status "Restoring $sourcePath into $destPath"
 
-            # Dossiers
+            # Directories
             if(Test-path -Path $sourcePath -pathtype leaf){
 
-                # Sauvegarde de $sourcePath dans $destPath
+                # Restored $sourcePath into $destPath
                 robocopy "$backupDir" "$destDir" "$directory" /E /COPY:DAT /R:1 /W:1 /XD * /log+:"$backupDir\robocopy.log"
 
-            # Fichiers
+            # Files
             }else{
                 if (Test-Path $sourcePath) {
-                    # Restauration de $sourcePath dans $destPath
+                    # Restored $sourcePath into $destPath
                     robocopy "$sourcePath" "$destPath" /E /COPY:DAT /R:1 /W:1
                 
                 } else {
@@ -120,10 +125,10 @@ function Restore-Directories {
             }
     }
     Write-Progress -Completed -Activity "OK"
-    Write-Host "Restauration terminée. Restauré dans $destDir"
+    Write-Host "Restoration completed. Restored into $destDir"
 }
 
-# Fonction qui permet de selectionner le dossier cible
+# Selects the target directory from the File browser
 function Browse-BackupDir {
     $folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
     if ($folderBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -131,22 +136,22 @@ function Browse-BackupDir {
     }
 }
 
-# Verifie si il faut les permissions admin pour acceder au dossier
+# Checks if admin privileges are needed to access the folder
 function Check-AdminRights {
     param (
         [string]$folderPath
     )
     try {
-        # Tentaive de recupereation des dossier
+        # Attempt to access the folder
         $items = Get-ChildItem -Path $folderPath -ErrorAction Stop
         return $false
     } catch {
-        # Si il y a une erreur on estime qu'il s'agit d'un manque de permission
+        # In case of an error we assume it was due to a lack of admin rights
         return $true
     }
 }
 
-
+# Updates the list of folders depending on the selected user
 function Update-Folders {
     
     param(
@@ -156,13 +161,13 @@ function Update-Folders {
 
     $checkList.Items.Clear()
 
-    # Recupération des Dossiers et Fichiers
+    # Getting Files and Folders
     $selectedDirectories = @{}
     $userDir = "C:\Users\$username"
     $existingDirectories = Get-ChildItem -Path $userDir -Directory -Force | Where-Object { -not ($_.Attributes -match "ReparsePoint") } 
     $existingFiles = Get-ChildItem -Path $userDir -File -Force | Where-Object { -not ($_.Attributes -match "ReparsePoint") }
 
-    # Ajout dossiers AppData
+    # Adding default AppData folders
     $appdata_size = 0
 
     foreach($directory in $appdata_directories){
@@ -177,17 +182,17 @@ function Update-Folders {
     $appdata_size_MB = $appdata_size / 1MB
     $appdata_size_MB = [Math]::Round($appdata_size_MB,2)
 
-    [void]$checkList.Items.Add("AppData (small)~~~~$appdata_size_MB Mo")
-    $index = [Array]::IndexOf($checkList.Items, "AppData (small)~~~~$appdata_size_MB Mo")
+    [void]$checkList.Items.Add("AppData (small)~~~~$appdata_size_MB Mb")
+    $index = [Array]::IndexOf($checkList.Items, "AppData (small)~~~~$appdata_size_MB Mb")
     $checkList.SetItemChecked($index,$true)
 
 
-    #Ajout Dossiers
+    # Adding Folders
     foreach ($directory in $existingDirectories) {
 
         $index = [Array]::IndexOf($existingDirectories, $directory)
         
-        Write-Progress -PercentComplete ($index/$existingDirectories.Count*100) -Activity "Récupération de données de l'utilisateur $username" -Status "Récupération de $directory"
+        Write-Progress -PercentComplete ($index/$existingDirectories.Count*100) -Activity "Reading data of user $username" -Status "Current folder : $directory"
 
         $requiresAdmin = Check-AdminRights -folderPath $directory.FullName
 
@@ -198,9 +203,9 @@ function Update-Folders {
                 $sizeInMB = $size / 1MB
                 $sizeInMB = [Math]::Round($sizeInMB,2)
 
-                [void]$checkList.Items.Add("$directory~~~~$sizeInMB Mo")
+                [void]$checkList.Items.Add("$directory~~~~$sizeInMB Mb")
                 if($checkedArray.Contains($directory.Name)){
-                    $index = [Array]::IndexOf($checkList.Items, "$directory~~~~$sizeInMB Mo")
+                    $index = [Array]::IndexOf($checkList.Items, "$directory~~~~$sizeInMB Mb")
                     $checkList.SetItemChecked($index,$true)
                 }
             }catch{
@@ -210,40 +215,35 @@ function Update-Folders {
     }
 
 
-    #Ajout Fichiers
+    # Adding files
     foreach ($file in $existingFiles) {
         $index = [Array]::IndexOf($existingFiles, $file)
         
-        Write-Progress -PercentComplete ($index/$existingFiles.Count*100) -Activity "Récupération de données de l'utilisateur $username" -Status "Récupération de $file"
+        Write-Progress -PercentComplete ($index/$existingFiles.Count*100) -Activity "Reading data of user $username" -Status "Current file : $file"
 
             $size = $file.length
             $sizeInMB = $size / 1MB
             $sizeInMB = [Math]::Round($sizeInMB,2)
 
-            [void]$checkList.Items.Add("$file~~~~$sizeInMB Mo")
+            [void]$checkList.Items.Add("$file~~~~$sizeInMB Mb")
             if($checkedArray.Contains($file.Name)){
-                $index = [Array]::IndexOf($checkList.Items, "$file~~~~$sizeInMB Mo")
+                $index = [Array]::IndexOf($checkList.Items, "$file~~~~$sizeInMB Mb")
                 $checkList.SetItemChecked($index,$true)
         }
     }
     Write-Progress -Completed -Activity "OK"
-    Write-Host "Données récupérées avec succés" 
+    Write-Host "Data obtained succesfuly" 
 }
 
-# Creation du formulaire
+# Creating form
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "Sauvegarde et Restauration de fichiers"
+$form.Text = "Backup and Restoration of files and folders"
 $form.Size = New-Object System.Drawing.Size(500, 410)
 $form.StartPosition = "CenterScreen"
 
 $backupDirLabel = New-Object System.Windows.Forms.Label
-$backupDirLabel.Text = "Backup Directory:"
+$backupDirLabel.Text = "Target Directory:"
 $backupDirLabel.Location = New-Object System.Drawing.Point(10, 20)
-$backupDirLabel.Size = New-Object System.Drawing.Size(120, 20)
-$form.Controls.Add($backupDirLabel)
-
-$backupDirEntry = New-Object System.Windows.Forms.TextBox
-$backupDirEntry.Location = New-Object System.Drawing.Point(10, 20)
 $backupDirLabel.Size = New-Object System.Drawing.Size(120, 20)
 $form.Controls.Add($backupDirLabel)
 
@@ -266,9 +266,9 @@ $checkList.CheckOnClick = $true
 
 $form.Controls.Add($checkList)
 
-#Bouton sauvegarder
+# Save button
 $backupButton = New-Object System.Windows.Forms.Button
-$backupButton.Text = "Sauvegarder"
+$backupButton.Text = "Save"
 $backupButton.Location = New-Object System.Drawing.Point(10, 320)
 $backupButton.Size = New-Object System.Drawing.Point(100, 30)
 $backupButton.Add_Click({
@@ -278,30 +278,29 @@ $backupButton.Add_Click({
     if($backupDir -and $chooseUser.SelectedItem){
         Backup-Directories -backupDir $backupDir -selectedItems $selectedItems -username $chooseUser.SelectedItem
     }else {
-        [System.Windows.Forms.MessageBox]::Show("Veuillez remplir tous les champs !")
+        [System.Windows.Forms.MessageBox]::Show("Please fill in all fields !")
     }
 })
 $form.Controls.Add($backupButton)
 
-# Bouton restaurer
+# Restore button
 $restoreButton = New-Object System.Windows.Forms.Button
-$restoreButton.Text = "Restaurer"
+$restoreButton.Text = "Restore"
 $restoreButton.Location = New-Object System.Drawing.Point(120, 320)
 $restoreButton.Size = New-Object System.Drawing.Point(100, 30)
 $restoreButton.Add_Click({
     $backupDir = $backupDirEntry.Text
-    Restore-Directories -backupDir $backupDir -username $chooseUser.SelectedItem
 
     if($backupDir -and $chooseUser.SelectedItem){
         Restore-Directories -backupDir $backupDir -username $chooseUser.SelectedItem
     }else {
-        [System.Windows.Forms.MessageBox]::Show("Veuillez remplir tous les champs !")
+        [System.Windows.Forms.MessageBox]::Show("Please fill in all fields !")
     }
 })
 $form.Controls.Add($restoreButton)
 
 $userLabel = New-Object System.Windows.Forms.Label
-$userLabel.Text = "Choisir l'utilisateur"
+$userLabel.Text = "Choose user"
 $userLabel.Location = New-Object System.Drawing.Point(260, 310)
 $userLabel.Size = New-Object System.Drawing.Point(150, 20)
 $form.Controls.Add($userLabel)
@@ -328,6 +327,6 @@ $chooseUser.Add_SelectedIndexChanged({
     Update-Folders -checkList $checkList -username $chooseUser.SelectedItem
 })
 
-# Affichage du formulaire
+# Show form
 $form.Add_Shown({ $form.Activate() })
 [void] $form.ShowDialog()
