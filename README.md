@@ -49,7 +49,7 @@ Once the process of saving/restoring is finished, a log file named ***robocopy_l
 # Added details :
 
 This tool won't save data from folders or files that need admin privileges to be read.  
-The full code is inside ***robocopy.ps1***, if you ever want to edit it go ahead but make sure to credit me if you post it online.  
+The full code is inside ***robocopy.ps1***, if you ever want to edit it go ahead but ***make sure to credit me if you post it online***.  
 If you want to recompile as an exe after editing it here is how i've managed to do it :  
 
 Replace this line : 
