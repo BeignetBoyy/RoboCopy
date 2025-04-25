@@ -40,9 +40,9 @@ The size of each folder/file is written next to it in Mb.
 As the value is rounded some folders or files may be displayed as empty even though they have data in them. 
 Files and folders under 5 Kb will be displayed as empty
 
-Once you think you've checked everything, just click on the Save button and everything you've checked will be copied from you ***C:\Users\<username>*** to the selected folder 
+Once you think you've checked everything, just click on the Save button and everything you've checked will be copied from your<br> ***C:\Users\\[username]*** to the selected folder 
 
-If you restore data, no matter what directories/files you have checked, everything will be restored from the selected folder to your ***C:\Users\<username>***
+If you restore data, no matter what directories/files you have checked, everything will be restored from the selected folder to your<br> ***C:\Users\\[username]***
 
 Once the process of saving/restoring is finished, a log file named ***robocopy_log*** will be created inside the target directory
 
