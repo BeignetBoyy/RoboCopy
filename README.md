@@ -37,7 +37,7 @@ It was added because of the long time it took to save the entire AppData folder.
 If you want to add default AppData directories you can add them in ***default_appdata.txt***  
 
 The size of each folder/file is written next to it in Mb. 
-As the value is rounded some folders or files may be displayed as empty even tho they have data in them. 
+As the value is rounded some folders or files may be displayed as empty even though they have data in them. 
 Files and folders under 5 Kb will be displayed as empty
 
 Once you think you've checked everything, just click on the Save button and everything you've checked will be copied from you ***C:\Users\<username>*** to the selected folder 
